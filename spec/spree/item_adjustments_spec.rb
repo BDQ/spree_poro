@@ -162,17 +162,15 @@ module Spree
     end
 
     context "best promotion is always applied" do
-      let(:action) do
-        action = Spree::Promotion::Actions::CreateItemAdjustments.new
-        action.amount = 10
-        action
+      def create_action
+        Spree::Promotion::Actions::CreateItemAdjustments.new
       end
 
       def create_adjustment(label, amount)
         adjustment = Spree::Adjustment.new
         adjustment.label = label
         adjustment.amount = amount
-        adjustment.source = action
+        adjustment.source = create_action
         adjustment.eligible = true
         item.adjustments << adjustment
         adjustment
@@ -191,7 +189,7 @@ module Spree
         subject.choose_best_promotion_adjustment
 
         eligible_promotion_adjustments = item.adjustments.select do |adjustment|
-          action.class === adjustment.source &&
+          Spree::PromotionAction === adjustment.source &&
           adjustment.eligible?
         end
 
@@ -209,7 +207,7 @@ module Spree
         subject.choose_best_promotion_adjustment
 
         eligible_promotion_adjustments = item.adjustments.select do |adjustment|
-          action.class === adjustment.source &&
+          Spree::PromotionAction === adjustment.source &&
           adjustment.eligible?
         end
 

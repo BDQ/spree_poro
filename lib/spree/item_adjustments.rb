@@ -57,7 +57,7 @@ module Spree
         end
 
         other_promotions = promotion_adjustments.select do |adjustment|
-          adjustment != best_promotion_adjustment
+          adjustment.source != best_promotion_adjustment.source
         end
 
         other_promotions.each do |adjustment|

@@ -1,5 +1,7 @@
 require "spree/version"
 
+require 'lotus/model'
+
 require 'spree/adjustment'
 require 'spree/country'
 require 'spree/line_item'
