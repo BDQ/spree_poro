@@ -1,16 +1,16 @@
 module Spree
   class Zone
-    attr_accessor :name, :members, :default_tax, :kind
+    include Lotus::Entity
 
+    self.attributes = :name, :members, :default_tax, :kind
 
-    def initialize
-      @members = []
-      Spree::Data[:zones] ||= []
-      Spree::Data[:zones] << self
+    def initialize(*args)
+      @members ||= []
+      super
     end
 
     def self.default_tax
-      Spree::Data[:zones].find { |zone| zone.default_tax }
+      Spree::ZoneRepository.default
     end
 
     def contains?(target)

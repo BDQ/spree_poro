@@ -60,10 +60,7 @@ module Spree
       let(:tax_category) { Spree::TaxCategory.new }
 
       let(:zone) do
-        zone = Spree::Zone.new
-        zone.name = 'America'
-        zone.default_tax = true
-        zone
+        create_zone(name: 'America', default_tax: true)
       end
 
       let(:order) do

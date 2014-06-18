@@ -9,33 +9,18 @@ module Spree
     end
 
     let!(:usa_zone) do
-      zone = Spree::Zone.new
-      zone.name = 'USA'
       usa = Spree::Country.new
-      zone.members << usa
-      zone.default_tax = true
-      zone.kind = 'country'
-      zone
+      create_zone(name: 'USA', members: [usa], default_tax: true, kind: 'country')
     end
 
     let!(:france_zone) do
-      zone = Spree::Zone.new
-      zone.name = 'France'
       france = Spree::Country.new
-      zone.members << france
-      zone.default_tax = false
-      zone.kind = 'country'
-      zone
+      create_zone(name: 'France', members: [france], default_tax: false, kind: 'country')
     end
 
     let!(:aus_zone) do
-      zone = Spree::Zone.new
-      zone.name = 'Australia'
       australia = Spree::Country.new
-      zone.members << australia
-      zone.default_tax = false
-      zone.kind = 'country'
-      zone
+      create_zone(name: 'Australia', members: [australia], default_tax: false, kind: 'country')
     end
 
     let!(:canada) do
@@ -52,21 +37,11 @@ module Spree
     end
 
     let!(:canada_zone) do
-      zone = Spree::Zone.new
-      zone.name = 'Canada'
-      zone.members << canada
-      zone.default_tax = false
-      zone.kind = 'country'
-      zone
+      create_zone(name: 'Canada', members: [canada], default_tax: false, kind: 'country')
     end
 
     let!(:bc_zone) do
-      zone = Spree::Zone.new
-      zone.name = 'BC'
-      zone.members << bc
-      zone.default_tax = false
-      zone.kind = 'state'
-      zone
+      create_zone(name: 'BC', members: [bc], default_tax: false, kind: 'state')
     end
 
     let!(:clothing_category) do
@@ -252,7 +227,9 @@ module Spree
         context "with French zone as the default" do
           before do
             usa_zone.default_tax = false
+            ZoneRepository.update(usa_zone)
             france_zone.default_tax = true
+            ZoneRepository.update(france_zone)
           end
 
           context "with an order for a USA customer" do

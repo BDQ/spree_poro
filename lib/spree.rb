@@ -1,6 +1,7 @@
 require "spree/version"
 
 require 'lotus/model'
+require 'lotus/model/adapters/memory_adapter'
 
 require 'spree/adjustment'
 require 'spree/country'
@@ -25,6 +26,8 @@ require 'spree/promotion/rules/item_total'
 require 'spree/promotion_handler/cart'
 
 require 'spree/item_adjustments'
+
+require 'spree/repositories/zone'
 
 module Spree
   Data = Hash.new { |hash, key| hash[key] = [] }

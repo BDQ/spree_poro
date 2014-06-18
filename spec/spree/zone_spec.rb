@@ -35,6 +35,7 @@ module Spree
       it "Canada zone contains Canada" do
         expect(canada_zone.contains?(canada_zone)).to be true
       end
+      
       it "Canada zone contains BC" do
         expect(canada_zone.contains?(bc_zone)).to be true
       end
