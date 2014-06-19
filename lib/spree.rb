@@ -27,10 +27,7 @@ require 'spree/promotion_handler/cart'
 
 require 'spree/item_adjustments'
 
-require 'spree/repositories/product'
-require 'spree/repositories/tax_category'
-require 'spree/repositories/tax_rate'
-require 'spree/repositories/zone'
+require 'spree/repositories/all'
 
 module Spree
   Data = Hash.new { |hash, key| hash[key] = [] }
