@@ -19,6 +19,10 @@ module Spree
 
       subject { Cart.new(order, line_item) }
 
+      before do
+        allow(subject).to receive(:promotions).and_return([promotion])
+      end
+
       context "activates in LineItem level" do
         let!(:action) do
           action = Spree::Promotion::Actions::CreateItemAdjustments.new
