@@ -1,6 +1,7 @@
 # Spree PORO
 
 [![Code Climate](https://codeclimate.com/github/radar/spree_poro.png)](https://codeclimate.com/github/radar/spree_poro)
+[![Build Status](https://travis-ci.org/radar/spree_poro.svg?branch=lotus)](https://travis-ci.org/radar/spree_poro)
 
 This is an attempt to represent Spree's data model in Plain Old Ruby Objects.
 
