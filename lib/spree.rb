@@ -27,6 +27,8 @@ require 'spree/promotion_handler/cart'
 
 require 'spree/item_adjustments'
 
+require 'spree/repositories/tax_category'
+require 'spree/repositories/tax_rate'
 require 'spree/repositories/zone'
 
 module Spree

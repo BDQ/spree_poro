@@ -10,17 +10,17 @@ module Spree
 
     let!(:usa_zone) do
       usa = Spree::Country.new
-      create_zone(name: 'USA', members: [usa], default_tax: true, kind: 'country')
+      create(:zone, name: 'USA', members: [usa], default_tax: true, kind: 'country')
     end
 
     let!(:france_zone) do
       france = Spree::Country.new
-      create_zone(name: 'France', members: [france], default_tax: false, kind: 'country')
+      create(:zone, name: 'France', members: [france], default_tax: false, kind: 'country')
     end
 
     let!(:aus_zone) do
       australia = Spree::Country.new
-      create_zone(name: 'Australia', members: [australia], default_tax: false, kind: 'country')
+      create(:zone, name: 'Australia', members: [australia], default_tax: false, kind: 'country')
     end
 
     let!(:canada) do
@@ -37,98 +37,73 @@ module Spree
     end
 
     let!(:canada_zone) do
-      create_zone(name: 'Canada', members: [canada], default_tax: false, kind: 'country')
+      create(:zone, 
+        name: 'Canada',
+        members: [canada],
+        default_tax: false,
+        kind: 'country'
+      )
     end
 
     let!(:bc_zone) do
-      create_zone(name: 'BC', members: [bc], default_tax: false, kind: 'state')
+      create(:zone,
+        name: 'BC',
+        members: [bc],
+        default_tax: false,
+        kind: 'state'
+      )
     end
 
     let!(:clothing_category) do
-      tax_category = Spree::TaxCategory.new
-      tax_category.name = "Clothing"
-      tax_category
+      create(:tax_category, name: 'Clothing')
     end
 
     let!(:food_category) do
-      tax_category = Spree::TaxCategory.new
-      tax_category.name = "Food"
-      tax_category
+      create(:tax_category, name: 'Food')
     end
 
     let!(:usa_tax_rate) do
-      tax_rate = Spree::TaxRate.new
-      tax_rate.name = "USA 10%"
-      tax_rate.included_in_price = false
-      tax_rate.amount = 0.1
-      tax_rate.currency = "USD"
-      tax_rate.tax_category = clothing_category
-      clothing_category.tax_rates << tax_rate
-      tax_rate.zone = usa_zone
-      tax_rate
+      create(:tax_rate,
+        name: 'USA 10%',
+        included_in_price: false,
+        amount: 0.1,
+        currency: 'USD',
+        tax_category_id: clothing_category.id,
+        zone_id: usa_zone.id
+      )
     end
 
     let!(:france_tax_rate) do
-      tax_rate = Spree::TaxRate.new
-      tax_rate.name = "EUR 5%"
-      tax_rate.included_in_price = true
-      tax_rate.amount = 0.05
-      tax_rate.currency = "FRF"
-      tax_rate.tax_category = clothing_category
-      clothing_category.tax_rates << tax_rate
-      tax_rate.zone = france_zone
-      tax_rate
+      create(:tax_rate,
+        name: 'EUR 5%',
+        included_in_price: true,
+        amount: 0.05,
+        currency: 'FRF',
+        tax_category_id: clothing_category.id,
+        zone_id: france_zone.id
+      )
     end
 
     let!(:canada_tax_rate) do
-      tax_rate = Spree::TaxRate.new
-      tax_rate.name = "5% PST"
-      tax_rate.included_in_price = true
-      tax_rate.amount = 0.05
-      tax_rate.currency = "CAD"
-      tax_rate.tax_category = clothing_category
-      clothing_category.tax_rates << tax_rate
-      tax_rate.zone = canada_zone
-      tax_rate
+      create(:tax_rate,
+        name: '5% PST',
+        included_in_price: true,
+        amount: 0.05,
+        currency: 'CAD',
+        tax_category_id: clothing_category.id,
+        zone_id: canada_zone.id
+      )
     end
-
 
     let!(:bc_tax_rate) do
-      tax_rate = Spree::TaxRate.new
-      tax_rate.name = "7% PST"
-      tax_rate.included_in_price = true
-      tax_rate.amount = 0.07
-      tax_rate.currency = "CAD"
-      tax_rate.tax_category = clothing_category
-      clothing_category.tax_rates << tax_rate
-      tax_rate.zone = bc_zone
-      tax_rate
-    end
-
-    context "match" do
-      context "with USA zone as default tax zone" do
-        before do
-          usa_zone.default_tax = true
-        end
-
-        it "picks USA tax rates" do
-          rates = Spree::TaxRate.match(order)
-          expect(rates).to include(usa_tax_rate)
-          expect(rates).to_not include(france_tax_rate)
-        end
-      end
-
-      context "based on order tax zone" do
-        before do
-          order.tax_zone = france_zone
-        end
-
-        it "returns both rates" do
-          rates = Spree::TaxRate.match(order)
-          expect(rates).to include(usa_tax_rate)
-          expect(rates).to_not include(france_tax_rate)
-        end
-      end
+      create(:tax_rate,
+        name: '7% PST',
+        included_in_price: true,
+        amount: 0.07,
+        currency: 'CAD',
+        tax_category_id: clothing_category.id,
+        zone_id: bc_zone.id
+      )
     end
 
     context ".adjust" do

@@ -2,22 +2,8 @@ require 'bigdecimal'
 
 module Spree
   class TaxRate
-    attr_accessor :tax_category, :name, :zone, :amount, :included_in_price, :currency
-
-    def initialize
-      Spree::Data[:tax_rates] ||= []
-      Spree::Data[:tax_rates] << self
-    end
-
-    def self.match(order)
-      Spree::Data[:tax_rates].select do |rate|
-        # Rates are excluded based on currency because of this:
-        # If you have a product priced in $10 USD, then it should be taxed at the USD rate.
-        # If someone buys that $10 USD product and they're not from a US tax zone, no tax rate applies.
-        # If that product is sold at $10 AUD instead, then the AUD tax rate should apply for that item, if there is one.
-        rate.currency == order.currency && (rate.zone.contains?(order.tax_zone) || rate.zone == Zone.default_tax)
-      end
-    end
+    include Lotus::Entity
+    self.attributes = [:name, :amount, :included_in_price, :currency, :zone_id, :tax_category_id]
 
     # Pre-tax amounts must be stored so that we can calculate
     # correct rate amounts in the future. For example:
@@ -31,7 +17,7 @@ module Spree
 
     def self.adjust(order, items)
       if order.tax_zone
-        rates = self.match(order)
+        rates = Spree::TaxRateRepository.match(order)
 
         # If there is a rate that matches this zone, then default tax zone does not apply.
         # In this case, we will only need to apply the tax rates that aren't from the default.
@@ -41,6 +27,7 @@ module Spree
         #    In this case, a *positive* adjustment is applied.
         # 2) The order's tax_zone does not match the default zone, and does not match any other tax zone.
         #    In this case, a *negative* adjustment (refund) is applied.
+
         if rates.count > 1
           rates.delete_if { |rate| rate.zone == Zone.default_tax }
         end
@@ -76,6 +63,14 @@ module Spree
           item.adjustments << adjustment
         end
       end
+    end
+
+    def tax_category
+      @tax_category ||= Spree::TaxCategoryRepository.find(tax_category_id)
+    end
+
+    def zone
+      @zone ||= Spree::ZoneRepository.find(zone_id)
     end
 
     private

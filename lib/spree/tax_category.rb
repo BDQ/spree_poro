@@ -1,9 +1,6 @@
 module Spree
   class TaxCategory
-    attr_accessor :tax_rates, :name
-
-    def initialize
-      @tax_rates = []
-    end
+    include Lotus::Entity
+    self.attributes = [:name]
   end
 end
