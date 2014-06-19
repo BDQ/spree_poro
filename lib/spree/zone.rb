@@ -24,5 +24,9 @@ module Spree
       end
       true
     end
+
+    def ==(other)
+      id ? super : object_id == other.object_id
+    end
   end
 end
