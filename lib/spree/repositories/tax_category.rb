@@ -17,4 +17,4 @@ Mutex.new.synchronize do
   mapper.load!
 end
 
-Spree::TaxCategoryRepository.adapter = Lotus::Model::Adapters::MemoryAdapter.new(mapper)
+Spree::TaxCategoryRepository.adapter = Spree.adapter_class.new(mapper)

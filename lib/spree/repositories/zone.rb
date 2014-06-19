@@ -26,4 +26,4 @@ Mutex.new.synchronize do
   mapper.load!
 end
 
-Spree::ZoneRepository.adapter = Lotus::Model::Adapters::MemoryAdapter.new(mapper)
+Spree::ZoneRepository.adapter = Spree.adapter_class.new(mapper)

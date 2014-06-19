@@ -3,6 +3,30 @@ require "spree/version"
 require 'lotus/model'
 require 'lotus/model/adapters/memory_adapter'
 
+module Spree
+
+  @@adapter_class = Lotus::Model::Adapters::MemoryAdapter
+
+  def self.adapter_class
+    @@adapter_class
+  end
+
+  def self.adapter_class=(klass)
+    @@adapter_class = klass
+  end
+
+  Data = Hash.new { |hash, key| hash[key] = [] }
+  
+  Config = {
+    currency_decimal_mark: ".",
+    currency_symbol_position: "before",
+    currency_sign_before_symbol: true,
+    currency_thousands_separator: ",",
+    display_currency: false,
+    hide_cents: false
+  }
+end
+
 require 'spree/adjustment'
 require 'spree/country'
 require 'spree/line_item'
@@ -28,16 +52,3 @@ require 'spree/promotion_handler/cart'
 require 'spree/item_adjustments'
 
 require 'spree/repositories/all'
-
-module Spree
-  Data = Hash.new { |hash, key| hash[key] = [] }
-  
-  Config = {
-    currency_decimal_mark: ".",
-    currency_symbol_position: "before",
-    currency_sign_before_symbol: true,
-    currency_thousands_separator: ",",
-    display_currency: false,
-    hide_cents: false
-  }
-end
