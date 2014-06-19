@@ -130,7 +130,7 @@ module Spree
           tax_adjustment.included = true
           tax_rate.included_in_price = true
           Spree::TaxRateRepository.update(tax_rate)
-          Spree::TaxRate.adjust(order, [item])
+          Spree::TaxRate.adjust(order, [item], [tax_rate])
         end
 
         it "tax has no bearing on final price" do

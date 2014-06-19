@@ -2,116 +2,139 @@
 
 module Spree
   describe TaxRate do
-    let!(:order) do
+    let(:order) do
       order = Spree::Order.new
       order.currency = 'USD'
       order
     end
 
-    let!(:usa_zone) do
+    let(:usa_zone) do
       usa = Spree::Country.new
-      create(:zone, name: 'USA', members: [usa], default_tax: true, kind: 'country')
+      zone = Spree::Zone.new
+      zone.name = 'USA'
+      zone.members << usa
+      zone.default_tax = true
+      zone.kind = 'country'
+      zone
     end
 
-    let!(:france_zone) do
+    let(:france_zone) do
       france = Spree::Country.new
-      create(:zone, name: 'France', members: [france], default_tax: false, kind: 'country')
+      zone = Spree::Zone.new
+      zone.name = 'France'
+      zone.members << france
+      zone.default_tax = false
+      zone.kind = 'country'
+      zone
     end
 
-    let!(:aus_zone) do
+    let(:aus_zone) do
       australia = Spree::Country.new
-      create(:zone, name: 'Australia', members: [australia], default_tax: false, kind: 'country')
+      zone = Spree::Zone.new
+      zone.name = 'Australia'
+      zone.members << australia
+      zone.default_tax = false
+      zone.kind = 'country'
+      zone
     end
 
-    let!(:canada) do
+    let(:canada) do
       canada = Spree::Country.new
       canada.name = 'Canada'
       canada
     end
 
-    let!(:bc) do
+    let(:bc) do
       bc = Spree::State.new
       bc.name = 'bc'
       bc.country = canada
       bc
     end
 
-    let!(:canada_zone) do
-      create(:zone, 
-        name: 'Canada',
-        members: [canada],
-        default_tax: false,
-        kind: 'country'
-      )
+    let(:canada_zone) do
+      zone = Spree::Zone.new
+      zone.name = 'Canada'
+      zone.members << canada
+      zone.default_tax = false
+      zone.kind = 'country'
+      zone
     end
 
-    let!(:bc_zone) do
-      create(:zone,
-        name: 'BC',
-        members: [bc],
-        default_tax: false,
-        kind: 'state'
-      )
+    let(:bc_zone) do
+      zone = Spree::Zone.new
+      zone.name = 'BC'
+      zone.members << bc
+      zone.default_tax = false
+      zone.kind = 'state'
+      zone
     end
 
-    let!(:clothing_category) do
-      create(:tax_category, name: 'Clothing')
+    let(:clothing_category) do
+      tax_category = Spree::TaxCategory.new
+      tax_category.name = 'Clothing'
+      tax_category
     end
 
-    let!(:food_category) do
-      create(:tax_category, name: 'Food')
+    let(:food_category) do
+      tax_category = Spree::TaxCategory.new
+      tax_category.name = 'Food'
+      tax_category
     end
 
-    let!(:usa_tax_rate) do
-      create(:tax_rate,
-        name: 'USA 10%',
-        included_in_price: false,
-        amount: 0.1,
-        currency: 'USD',
-        tax_category_id: clothing_category.id,
-        zone_id: usa_zone.id
-      )
+    let(:usa_rate) do
+      tax_rate = Spree::TaxRate.new
+      tax_rate.name = 'USA 10%'
+      tax_rate.included_in_price = false
+      tax_rate.amount = 0.1
+      tax_rate.currency = 'USD'
+      allow(tax_rate).to receive(:zone).and_return(usa_zone)
+      allow(tax_rate).to receive(:tax_category).and_return(clothing_category)
+      tax_rate
     end
 
-    let!(:france_tax_rate) do
-      create(:tax_rate,
-        name: 'EUR 5%',
-        included_in_price: true,
-        amount: 0.05,
-        currency: 'FRF',
-        tax_category_id: clothing_category.id,
-        zone_id: france_zone.id
-      )
+    let(:france_rate) do
+      tax_rate = Spree::TaxRate.new
+      tax_rate.name = 'EUR 5%'
+      tax_rate.included_in_price = true
+      tax_rate.amount = 0.05
+      tax_rate.currency = 'FRF'
+      allow(tax_rate).to receive(:zone).and_return(france_zone)
+      allow(tax_rate).to receive(:tax_category).and_return(clothing_category)
+      tax_rate
     end
 
-    let!(:canada_tax_rate) do
-      create(:tax_rate,
-        name: '5% PST',
-        included_in_price: true,
-        amount: 0.05,
-        currency: 'CAD',
-        tax_category_id: clothing_category.id,
-        zone_id: canada_zone.id
-      )
+    let(:canada_rate) do
+      tax_rate = Spree::TaxRate.new
+      tax_rate.name = '5% PST'
+      tax_rate.included_in_price = true
+      tax_rate.amount = 0.05
+      tax_rate.currency = 'CAD'
+      allow(tax_rate).to receive(:zone).and_return(canada_zone)
+      allow(tax_rate).to receive(:tax_category).and_return(clothing_category)
+      tax_rate
     end
 
-    let!(:bc_tax_rate) do
-      create(:tax_rate,
-        name: '7% PST',
-        included_in_price: true,
-        amount: 0.07,
-        currency: 'CAD',
-        tax_category_id: clothing_category.id,
-        zone_id: bc_zone.id
-      )
+    let(:bc_rate) do
+      tax_rate = Spree::TaxRate.new
+      tax_rate.name = '7% PST'
+      tax_rate.included_in_price = true
+      tax_rate.amount = 0.07
+      tax_rate.currency = 'CAD'
+      allow(tax_rate).to receive(:zone).and_return(bc_zone)
+      allow(tax_rate).to receive(:tax_category).and_return(clothing_category)
+      tax_rate
     end
 
     context ".adjust" do
+      before do
+        allow(Zone).to receive(:default_tax).and_return(usa_zone)
+      end
+
       context "with line items" do
-        before do
-          product = Spree::Product.new(
-            tax_category_id: clothing_category.id
-          )
+        let(:product) { Spree::Product.new }
+
+        before do  
+          allow(product).to receive(:tax_category).and_return(clothing_category)
 
           variant = Spree::Variant.new
           variant.product = product
@@ -123,31 +146,37 @@ module Spree
           order.line_items << line_item
         end
 
-        it "adds 10% default tax for the order's line item" do
-          Spree::TaxRate.adjust(order, order.line_items)
-          expect(order.line_items.first.adjustments.count).to eq(1)
-          adjustment = order.line_items.first.adjustments.first
-          expect(adjustment.amount).to eq(1) # = 10% of $10.
-          expect(adjustment.included).to eq(false)
-        end
-
-        it "bases the 10% off the discounted amount" do
-          order.line_items.first.promo_total = -5
-          Spree::TaxRate.adjust(order, order.line_items)
-          expect(order.line_items.first.adjustments.count).to eq(1)
-          adjustment = order.line_items.first.adjustments.first
-          expect(adjustment.amount).to eq(0.5) # = 10% of $5.
-          expect(adjustment.included).to eq(false)
-        end
-
-        context "with a line item with a different tax category" do
+        context "within the default tax zone" do
           before do
-            order.line_items.first.variant.product.tax_category_id = food_category.id
+            order.tax_zone = usa_zone
           end
 
-          it "does not apply an adjustment" do
-            Spree::TaxRate.adjust(order, order.line_items)
-            expect(order.line_items.first.adjustments.count).to eq(0)
+          it "adds 10% default tax for the order's line item" do
+            Spree::TaxRate.adjust(order, order.line_items, [usa_rate])
+            expect(order.line_items.first.adjustments.count).to eq(1)
+            adjustment = order.line_items.first.adjustments.first
+            expect(adjustment.amount).to eq(1) # = 10% of $10.
+            expect(adjustment.included).to eq(false)
+          end
+
+          it "bases the 10% off the discounted amount" do
+            order.line_items.first.promo_total = -5
+            Spree::TaxRate.adjust(order, order.line_items, [usa_rate])
+            expect(order.line_items.first.adjustments.count).to eq(1)
+            adjustment = order.line_items.first.adjustments.first
+            expect(adjustment.amount).to eq(0.5) # = 10% of $5.
+            expect(adjustment.included).to eq(false)
+          end
+
+          context "with a line item with a different tax category" do
+            before do
+              allow(product).to receive(:tax_category).and_return(food_category)
+            end
+
+            it "does not apply an adjustment" do
+              Spree::TaxRate.adjust(order, order.line_items, [usa_rate])
+              expect(order.line_items.first.adjustments.count).to eq(0)
+            end
           end
         end
 
@@ -158,7 +187,7 @@ module Spree
           end
 
           it "includes 5% tax for the order's line item" do
-            Spree::TaxRate.adjust(order, order.line_items)
+            Spree::TaxRate.adjust(order, order.line_items, [france_rate])
             expect(order.line_items.first.adjustments.count).to eq(1)
             adjustment = order.line_items.first.adjustments.first
             expect(adjustment.amount.round(2)).to eq(0.48) # 10 - (10 / 105%) = 0.476, but we round to 2.
@@ -175,7 +204,7 @@ module Spree
           # See https://github.com/spree/spree/issues/4318#issuecomment-34601738
           # This is the only instance I know of in the world where two taxes can apply at once.
           it "applies both the GST (5%) and PST (7%) taxes" do
-            Spree::TaxRate.adjust(order, order.line_items)
+            Spree::TaxRate.adjust(order, order.line_items, [canada_rate, bc_rate])
             item = order.line_items.first
             expect(item.adjustments.count).to eq(2)
             inclusive = order.line_items.first.adjustments.map(&:included)
@@ -195,7 +224,7 @@ module Spree
           
           # Tax rate is additional, so it makes no sense to refund a tax that hasn't been applied yet!
           it "applies no tax adjustment at all" do
-            Spree::TaxRate.adjust(order, order.line_items)
+            Spree::TaxRate.adjust(order, order.line_items, [usa_rate])
             expect(order.line_items.first.adjustments.count).to eq(0)
           end
         end
@@ -203,23 +232,7 @@ module Spree
         context "with French zone as the default" do
           before do
             usa_zone.default_tax = false
-            ZoneRepository.update(usa_zone)
             france_zone.default_tax = true
-            ZoneRepository.update(france_zone)
-          end
-
-          context "with an order for a USA customer" do
-            before do
-              order.tax_zone = usa_zone
-            end
-
-            it "applies the 10% tax from the US" do
-              Spree::TaxRate.adjust(order, order.line_items)
-              expect(order.line_items.first.adjustments.count).to eq(1)
-              adjustment = order.line_items.first.adjustments.first
-              expect(adjustment.amount).to eq(1) #10% of $10.
-              expect(adjustment.included).to eq(false)
-            end
           end
 
           context "with an order for a AUS customer" do
@@ -229,20 +242,16 @@ module Spree
             end
 
             it "applies the 5% tax refund from EUR" do
-              Spree::TaxRate.adjust(order, order.line_items)
+              Spree::TaxRate.adjust(order, order.line_items, [france_rate])
               expect(order.line_items.first.adjustments.count).to eq(1)
               adjustment = order.line_items.first.adjustments.first
               expect(adjustment.amount.round(2)).to eq(-0.48) # 10 - ( 10 / (1 + 5%  ) ) = 0.476, but we round to 2.
               expect(adjustment.included).to eq(false)
             end
 
-            context "when order uses AUD" do
-              before do
-                order.currency = 'AUD'
-              end
-
-              it "does not apply a refund" do
-                Spree::TaxRate.adjust(order, order.line_items)
+            context "when given no rates" do
+              it "does not apply any adjustments" do
+                Spree::TaxRate.adjust(order, order.line_items, [])
                 expect(order.line_items.first.adjustments.count).to eq(0)
               end 
             end
@@ -261,7 +270,7 @@ module Spree
         end
 
         it "adds 10% default tax for the order's shipment" do
-          Spree::TaxRate.adjust(order, order.shipments)
+          Spree::TaxRate.adjust(order, order.shipments, [usa_rate])
           shipment = order.shipments.first
           expect(shipment.adjustments.count).to eq(1)
           adjustment = shipment.adjustments.first
@@ -272,7 +281,7 @@ module Spree
         it "bases the 10% off the discounted amount" do
           shipment = order.shipments.first
           shipment.discounted_cost = 5
-          Spree::TaxRate.adjust(order, order.shipments)
+          Spree::TaxRate.adjust(order, order.shipments, [usa_rate])
           expect(shipment.adjustments.count).to eq(1)
           adjustment = shipment.adjustments.first
           expect(adjustment.amount).to eq(0.5) # = 10% of $5.
@@ -282,11 +291,10 @@ module Spree
         context "in the French zone" do
           before do
             order.tax_zone = france_zone
-            order.currency = 'FRF'
           end
 
           it "includes 5% tax for the order's shipment" do
-            Spree::TaxRate.adjust(order, order.shipments)
+            Spree::TaxRate.adjust(order, order.shipments, [france_rate])
             shipment = order.shipments.first
             expect(shipment.adjustments.count).to eq(1)
             adjustment = shipment.adjustments.first

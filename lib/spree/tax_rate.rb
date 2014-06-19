@@ -15,10 +15,8 @@ module Spree
       end
     end
 
-    def self.adjust(order, items)
+    def self.adjust(order, items, rates)
       if order.tax_zone
-        rates = Spree::TaxRateRepository.match(order)
-
         # If there is a rate that matches this zone, then default tax zone does not apply.
         # In this case, we will only need to apply the tax rates that aren't from the default.
         #
