@@ -90,9 +90,9 @@ module Spree
       end
 
       let(:product) do
-        product = Spree::Product.new
-        product.tax_category = tax_category
-        product
+        create(:product,
+          tax_category_id: tax_category.id
+        )
       end
 
       let(:variant) do

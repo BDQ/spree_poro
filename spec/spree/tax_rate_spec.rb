@@ -109,11 +109,12 @@ module Spree
     context ".adjust" do
       context "with line items" do
         before do
-          product = Spree::Product.new
+          product = Spree::Product.new(
+            tax_category_id: clothing_category.id
+          )
+
           variant = Spree::Variant.new
           variant.product = product
-          product.master = variant
-          product.tax_category = clothing_category
 
           line_item = Spree::LineItem.new
           line_item.price = 10
@@ -141,7 +142,7 @@ module Spree
 
         context "with a line item with a different tax category" do
           before do
-            order.line_items.first.variant.product.tax_category = food_category
+            order.line_items.first.variant.product.tax_category_id = food_category.id
           end
 
           it "does not apply an adjustment" do
